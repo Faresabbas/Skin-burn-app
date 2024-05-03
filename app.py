@@ -50,14 +50,11 @@ def api():
             if max_prob >= threshold * Decimal('0.95'):
                 prediction = classes[ind]
                 return jsonify({
-                    'Class': prediction,
-                    'Error': 'No burn detected or normal skin. Please re-image the skin again There may be a burn.',
-                    'Message': 'The highest probability is less than the threshold by 5%.'
+                    'Error': 'No burn detected or normal skin. Please re-image the skin again There may be a '+ prediction +'.'
                 })
             else:
                 return jsonify({
                     'Error': 'No burn detected or normal skin.',
-                    'Message': 'Please re-image the skin again. There may be a burn.'
                 })
         prediction = classes[ind]
         return jsonify({'prediction': prediction})
@@ -77,9 +74,9 @@ def predict():
             if max_prob < threshold:
                 if max_prob >= threshold * Decimal('0.95'):
                     prediction = classes[ind]
-                    return render_template('index.html', prediction='No burn detected or normal skin. Please re-image the skin again There may be a burn.', class_prediction=prediction, image='static/IMG/', appName="Skin Burn Recognition Application")
+                    return render_template('index.html', prediction='No burn detected or normal skin. Please re-image the skin again There may be a ' +prediction +'.', class_prediction=prediction, image='static/IMG/', appName="Skin Burn Recognition Application")
                 else:
-                    return render_template('index.html', prediction='No burn detected or normal skin. Please re-image the skin again There may be a burn.', appName="Skin Burn Recognition Application")
+                    return render_template('index.html', prediction='No burn detected or normal skin. Please re-image the skin again There may be a '+prediction +'.', appName="Skin Burn Recognition Application")
             else:
                 prediction = classes[ind]
                 return render_template('index.html', prediction=prediction, image='static/IMG/', appName="Skin Burn Recognition Application")
