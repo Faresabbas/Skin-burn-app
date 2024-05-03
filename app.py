@@ -47,12 +47,6 @@ def api():
         max_prob = Decimal(str(result[0, ind]))
         threshold = thresholds[ind]
         if max_prob < threshold:
-            if max_prob >= threshold * Decimal('0.95'):
-                prediction = classes[ind]
-                return jsonify({
-                    'Error': 'No burn detected or normal skin. Please re-image the skin again There may be a '+ prediction +'.'
-                })
-            else:
                 return jsonify({
                     'Error': 'No burn detected or normal skin.',
                 })
@@ -72,10 +66,6 @@ def predict():
             max_prob = Decimal(str(result[0, ind]))
             threshold = thresholds[ind]
             if max_prob < threshold:
-                if max_prob >= threshold * Decimal('0.95'):
-                    prediction = classes[ind]
-                    return render_template('index.html', prediction='No burn detected or normal skin. Please re-image the skin again There may be a ' +prediction +'.', class_prediction=prediction, image='static/IMG/', appName="Skin Burn Recognition Application")
-                else:
                     return render_template('index.html', prediction='No burn detected or normal skin. Please re-image the skin again There may be a burn.', appName="Skin Burn Recognition Application")
             else:
                 prediction = classes[ind]
