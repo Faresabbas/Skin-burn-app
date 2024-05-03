@@ -1,8 +1,11 @@
 from flask import Flask, request, render_template, jsonify
 from PIL import Image
 import numpy as np
-from decimal import Decimal
-import tensorflow as tf  # Make sure to import TensorFlow
+from decimal import Decimal, getcontext
+import tensorflow as tf
+
+# Set precision for Decimal operations
+getcontext().prec = 6
 
 app = Flask(__name__)
 
@@ -19,7 +22,7 @@ interpreter.allocate_tensors()
 input_details = interpreter.get_input_details()
 output_details = interpreter.get_output_details()
 
-classes = ['1st degree burn', '2nd degree burn', '3rd degree burn']
+classes = ['First Degree burn', 'Second Degree burn', 'Third Degree burn']
 thresholds = [Decimal('0.9996'), Decimal('0.99'), Decimal('0.999')]
 
 @app.route('/')
@@ -42,8 +45,20 @@ def api():
         result = model_predict(image_arr)
         ind = np.argmax(result)
         max_prob = Decimal(str(result[0, ind]))
-        if max_prob < thresholds[ind]:
-            return jsonify({'Error': 'No burn detected or normal skin.'})
+        threshold = thresholds[ind]
+        if max_prob < threshold:
+            if max_prob >= threshold * Decimal('0.95'):
+                prediction = classes[ind]
+                return jsonify({
+                    'Class': prediction,
+                    'Error': 'No burn detected or normal skin. Please re-image the skin again There may be a burn.',
+                    'Message': 'The highest probability is less than the threshold by 5%.'
+                })
+            else:
+                return jsonify({
+                    'Error': 'No burn detected or normal skin.',
+                    'Message': 'Please re-image the skin again. There may be a burn.'
+                })
         prediction = classes[ind]
         return jsonify({'prediction': prediction})
     except Exception as e:
@@ -58,11 +73,16 @@ def predict():
             result = model_predict(image_arr)
             ind = np.argmax(result)
             max_prob = Decimal(str(result[0, ind]))
-            if max_prob < thresholds[ind]:
-                prediction = "No burn detected or normal skin."
+            threshold = thresholds[ind]
+            if max_prob < threshold:
+                if max_prob >= threshold * Decimal('0.95'):
+                    prediction = classes[ind]
+                    return render_template('index.html', prediction='No burn detected or normal skin. Please re-image the skin again There may be a burn.', class_prediction=prediction, image='static/IMG/', appName="Skin Burn Recognition Application")
+                else:
+                    return render_template('index.html', prediction='No burn detected or normal skin. Please re-image the skin again There may be a burn.', appName="Skin Burn Recognition Application")
             else:
                 prediction = classes[ind]
-            return render_template('index.html', prediction=prediction, image='static/IMG/', appName="Skin Burn Recognition Application")
+                return render_template('index.html', prediction=prediction, image='static/IMG/', appName="Skin Burn Recognition Application")
         except Exception as e:
             return render_template('index.html', prediction='Error: ' + str(e), appName="Skin Burn Recognition Application")
     else:
@@ -70,4 +90,3 @@ def predict():
 
 if __name__ == '__main__':
     app.run(debug=True)
-
