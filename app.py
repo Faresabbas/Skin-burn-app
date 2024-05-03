@@ -66,7 +66,7 @@ def predict():
             max_prob = Decimal(str(result[0, ind]))
             threshold = thresholds[ind]
             if max_prob < threshold:
-                    return render_template('index.html', prediction='No burn detected or normal skin. Please re-image the skin again There may be a burn.', appName="Skin Burn Recognition Application")
+                    return render_template('index.html', prediction='No burn detected or normal skin.', appName="Skin Burn Recognition Application")
             else:
                 prediction = classes[ind]
                 return render_template('index.html', prediction=prediction, image='static/IMG/', appName="Skin Burn Recognition Application")
