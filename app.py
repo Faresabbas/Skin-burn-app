@@ -23,7 +23,7 @@ input_details = interpreter.get_input_details()
 output_details = interpreter.get_output_details()
 
 classes = ['First Degree burn', 'Second Degree burn', 'Third Degree burn']
-thresholds = [Decimal('0.9996'), Decimal('0.99'), Decimal('0.999')]
+thresholds = [Decimal('0.99996'), Decimal('0.999'), Decimal('0.999')]
 
 @app.route('/')
 def index():
